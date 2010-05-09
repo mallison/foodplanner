@@ -53,7 +53,7 @@ class Ingredient(BasePluralizableModel):
 class IngredientMeasure(models.Model):
     recipe = models.ForeignKey(Recipe, related_name="ingredients")
     ingredient = models.ForeignKey(Ingredient, related_name="measures")
-    amount = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=10, decimal_places=4)
     unit = models.ForeignKey('Unit', null=True, blank=True)
 
 
