@@ -13,10 +13,13 @@ class Meal(models.Model):
 
 
 class MealChoice(models.Model):
-    day = models.DateField()
+    date = models.DateField()
     meal = models.ForeignKey(Meal, related_name="choices")
     recipe = models.ForeignKey('Recipe', related_name="choices")
-    
+
+    class Meta:
+        unique_together = ('date', 'meal')
+
 
 class Recipe(models.Model):
     name = models.CharField(max_length=100)
@@ -28,7 +31,17 @@ class Recipe(models.Model):
         return self.name
 
 
-class Ingredient(models.Model):
+class BasePluralizableModel(models.Model):
+    plural_name = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def pluralize(self):
+        return self.plural_name or self.name + 's'
+
+
+class Ingredient(BasePluralizableModel):
     name = models.CharField(max_length=100)
     
     def __unicode__(self):
@@ -42,7 +55,7 @@ class IngredientMeasure(models.Model):
     unit = models.ForeignKey('Unit', null=True, blank=True)
 
 
-class Unit(models.Model):
+class Unit(BasePluralizableModel):
     name = models.CharField(max_length=30)
     symbol = models.CharField(max_length=10, blank=True)
 

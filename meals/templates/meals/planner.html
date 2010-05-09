@@ -1,0 +1,14 @@
+<h1>Planner</h1>
+<form method="post" action=".">
+    <table>
+        {{ formset }}
+    </table>
+    <input type="submit" name="submit" value="submit">
+</form>
+<h1>Shopping list</h1>
+<table>
+{% for ingredient, amount in shopping_list.items %}
+    <tr>
+        <td>{{ amount.amount }} {{ amount.pluralize_unit }}</td><td>{{ amount.pluralize_ingredient }}</td>
+    </tr>
+{% endfor %}

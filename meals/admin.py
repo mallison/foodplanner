@@ -17,7 +17,7 @@ admin.site.register(models.Meal,
                     list_display=('name', 'order'),
                     list_editable=('order',))
 admin.site.register(models.MealChoice,
-                    list_display=('meal', 'day', 'recipe'))
+                    list_display=('meal', 'date', 'recipe'))
 admin.site.register(models.Recipe,
                     inlines=(IngredientMeasureInline,))
 admin.site.register(models.Ingredient)
