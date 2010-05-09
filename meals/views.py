@@ -31,19 +31,28 @@ def planner(request, year, month, day, scope):
             for meals_for_day in utils.itergroup(formset.cleaned_data, 
                                                  meals.count()):
                 for meal, choice in zip(meals, meals_for_day):
-                    if choice['recipe']:
-                        meal_choice, created = models.MealChoice.objects.get_or_create(
+                    try:
+                        meal_choice = models.MealChoice.objects.get(
                             date=weekday,
-                            meal=meal,
-                            defaults={'recipe': choice['recipe']})
-                        if not created:
+                            meal=meal)
+                    except models.MealChoice.DoesNotExist:
+                        if choice['recipe']:
+                            meal_choice = models.MealChoice.objects.create(
+                                date=weekday,
+                                meal=meal,
+                                recipe=choice['recipe'])
+                    else:
+                        if not choice['recipe']:
+                            meal_choice.delete()
+                        else:
                             if meal_choice.recipe != choice['recipe']:
                                 meal_choice.recipe = choice['recipe']
                                 meal_choice.save()
                 weekday += datetime.timedelta(1)
-            return HttpResponseRedirect(reverse('meals-planner',
-                                                args=(year, month, day, scope)))
-    else:
+            if not request.is_ajax():
+                return HttpResponseRedirect(
+                    reverse('meals-planner', args=(year, month, day, scope)))
+    if request.method == 'GET' or request.is_ajax():
         initial = []
         meals = models.Meal.objects.order_by('order')
         for days in range(days_ahead):
@@ -60,8 +69,12 @@ def planner(request, year, month, day, scope):
                                     'recipe': meal_choice.recipe.pk})
         formset = forms.MealChoiceFormSet(initial=initial)
         grouped_forms = utils.itergroup(formset.forms, meals.count())
+    if request.is_ajax():
+        template = 'planner_inner'
+    else:
+        template = 'planner'
     return render_to_response(
-        'meals/planner.html',
+        'meals/%s.html' % template,
         {'formset': formset,
          'meals': meals,
          'weekdays': iter(weekdays),

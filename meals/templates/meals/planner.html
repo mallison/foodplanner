@@ -6,35 +6,19 @@
         font-size: 62.5%;
     }
     </style>
+    <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 </head>
 <body>
 <h1>Meal planner</h1>
-<form method="post" action=".">
-    {{ formset.management_form }}
-    <table>
-        <tr>
-            <th></th>
-            {% for meal in meals %}
-                <th>{{ meal.name }}</th>
-            {% endfor %}
-        </tr>
-        {% for group in grouped_forms %}
-            <tr>
-                <th>{{ weekdays.next }}</th>
-                {% for form in group %}
-                    <td>{{ form.as_p }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-    <input type="submit" name="submit" value="submit">
-</form>
-<h1>Shopping list</h1>
-<table>
-{% for ingredient, amount in shopping_list.items %}
-    <tr>
-        <td>{{ amount.amount }} {{ amount.pluralize_unit }}</td><td>{{ amount.pluralize_ingredient }}</td>
-    </tr>
-{% endfor %}
+<div id="planner">
+    {% include "meals/planner_inner.html" %}
+</div>
+<script>
+$(function () {
+    $('#planner select').live('change', function () {
+        $('#planner').load('.', $('form').serializeArray());
+    });
+})
+</script>
 </body>
 </html>
