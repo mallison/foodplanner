@@ -1,7 +1,31 @@
-<h1>Planner</h1>
+<html>
+<head>
+    <title>Meal planner</title>
+    <style type="text/css">
+    body {
+        font-size: 62.5%;
+    }
+    </style>
+</head>
+<body>
+<h1>Meal planner</h1>
 <form method="post" action=".">
+    {{ formset.management_form }}
     <table>
-        {{ formset }}
+        <tr>
+            <th></th>
+            {% for meal in meals %}
+                <th>{{ meal.name }}</th>
+            {% endfor %}
+        </tr>
+        {% for group in grouped_forms %}
+            <tr>
+                <th>{{ weekdays.next }}</th>
+                {% for form in group %}
+                    <td>{{ form.as_p }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
     </table>
     <input type="submit" name="submit" value="submit">
 </form>
@@ -12,3 +36,5 @@
         <td>{{ amount.amount }} {{ amount.pluralize_unit }}</td><td>{{ amount.pluralize_ingredient }}</td>
     </tr>
 {% endfor %}
+</body>
+</html>

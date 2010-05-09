@@ -4,11 +4,9 @@ import models
 
 
 class MealChoiceForm(forms.Form):
-    meal = forms.ModelChoiceField(
-        models.Meal.objects, 
-        #widget=forms.Select(attrs={'disabled': 'disabled'})
-        )
-    recipe = forms.ModelChoiceField(models.Recipe.objects, required=False)
+    recipe = forms.ModelChoiceField(models.Recipe.objects, 
+                                    required=False,
+                                    label='')
 
 
 MealChoiceFormSet = forms.formsets.formset_factory(MealChoiceForm, extra=0)
