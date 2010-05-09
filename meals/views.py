@@ -73,6 +73,7 @@ def planner(request, year, month, day, scope):
 class Amount(object):
     def __init__(self, ingredient, amount, unit):
         self.ingredient = ingredient
+        #TODO: use decimals for amounts
         self.amount = amount
         self.unit = unit
     
@@ -97,6 +98,11 @@ class Amount(object):
                     conversion.to_unit)
         return new_amount
 
+    def divide(self, parts):
+        return self.__class__(self.ingredient, 
+                              self.amount / float(parts),
+                              self.unit)
+
     def pluralize_ingredient(self):
         if not self.unit and self.amount > 1:
             return self.ingredient.pluralize()
@@ -119,7 +125,8 @@ def _get_shopping_list(start_date, end_date):
         ingredient = measure.ingredient
         if not shopping_list.has_key(ingredient):
             shopping_list[ingredient] = Amount(ingredient, 0, measure.unit)
-        shopping_list[ingredient] += Amount(ingredient,
-                                            measure.amount, 
-                                            measure.unit)
+        shopping_list[ingredient] += Amount(
+            ingredient,
+            measure.amount, 
+            measure.unit).divide(measure.recipe.serves)
     return shopping_list

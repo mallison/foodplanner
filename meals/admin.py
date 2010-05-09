@@ -19,7 +19,9 @@ admin.site.register(models.Meal,
 admin.site.register(models.MealChoice,
                     list_display=('meal', 'date', 'recipe'))
 admin.site.register(models.Recipe,
-                    inlines=(IngredientMeasureInline,))
+                    inlines=(IngredientMeasureInline,),
+                    list_display=('name', 'serves'),
+                    list_editable=('serves',))
 admin.site.register(models.Ingredient)
 admin.site.register(models.Conversion,
                     list_display=('from_unit', 'factor', 'to_unit', 'is_exact'))

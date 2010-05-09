@@ -26,6 +26,7 @@ class Recipe(models.Model):
     preparation_time = models.PositiveIntegerField()
     cooking_time = models.PositiveIntegerField()
     method = models.TextField()
+    serves = models.PositiveIntegerField()
     
     def __unicode__(self):
         return self.name
