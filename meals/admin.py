@@ -14,7 +14,7 @@ class ConversionInline(admin.TabularInline):
 
 
 admin.site.register(models.Meal,
-                    list_display=('name', 'order'),
+                    list_display=('name', 'order', 'default'),
                     list_editable=('order',))
 admin.site.register(models.MealChoice,
                     list_display=('meal', 'date', 'recipe'))

@@ -53,7 +53,8 @@ def planner(request, year, month, day, scope):
                         date=date + datetime.timedelta(days),
                         meal=meal)
                 except models.MealChoice.DoesNotExist:
-                    initial.append({'meal': meal.pk})
+                    initial.append({'meal': meal.pk,
+                                    'recipe': meal.default and meal.default.pk})
                 else:
                     initial.append({'meal': meal.pk,
                                     'recipe': meal_choice.recipe.pk})

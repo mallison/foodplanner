@@ -4,6 +4,7 @@ from django.db import models
 class Meal(models.Model):
     order = models.PositiveIntegerField()
     name = models.CharField(max_length=20)
+    default = models.ForeignKey('Recipe', null=True, blank=True)
 
     class Meta:
         ordering = ('order',)
