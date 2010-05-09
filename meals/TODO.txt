@@ -1,0 +1,5 @@
+- group amounts into shopping quantites (so slices into loafs, that sort of thing)
+- optionally tie a unit to an ingredient? (you can't have slices of olive oil!)
+- add cost per unit to estimate shopping bill
+- nutritional information would be the other obvious thing to add!!
+
