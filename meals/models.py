@@ -73,3 +73,22 @@ class Conversion(models.Model):
     
     def __unicode__(self):
         return u'1 %s = %s %s' % (self.from_unit, self.factor, self.to_unit)
+
+
+class Nutrient(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Nutrition(models.Model):
+    nutrient = models.ForeignKey(Nutrient)
+    ingredient = models.ForeignKey(Ingredient)
+    ingredient_amount = models.DecimalField(decimal_places=2, max_digits=6)
+    ingredient_unit = models.ForeignKey(Unit, null=True, related_name="nutrition_ingredients")
+    nutrient_amount = models.DecimalField(decimal_places=2, max_digits=6)
+    nutrient_unit = models.ForeignKey(Unit, null=True, related_name="nutrition_nutrients")
+    
+    class Meta:
+        unique_together = ('nutrient', 'ingredient')

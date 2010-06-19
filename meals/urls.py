@@ -15,4 +15,10 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
+
+    # need this while I don't have internet access :(
+    (r'^jquery/', 
+     'django.views.static.serve',
+     {'document_root': '/home/mark/code/third_party/django/django/contrib/admin/media/js/',
+      'path': 'jquery.min.js'})
 )

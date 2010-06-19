@@ -6,7 +6,8 @@
         font-size: 62.5%;
     }
     </style>
-    <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+    <!--script src="http://code.jquery.com/jquery-1.4.2.min.js"></script-->
+    <script src="/jquery/"></script>
 </head>
 <body>
 <h1>Meal planner</h1>
@@ -16,6 +17,7 @@
 <script>
 $(function () {
     $('#planner select').live('change', function () {
+        $('#shopping-list').text('Loading ...');
         $('#planner').load('.', $('form').serializeArray());
     });
 })

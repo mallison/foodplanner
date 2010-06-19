@@ -1,5 +1,7 @@
+import collections
 import datetime
 import time
+from decimal import Decimal
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
@@ -55,7 +57,9 @@ def planner(request, year, month, day, scope):
     if request.method == 'GET' or request.is_ajax():
         initial = []
         meals = models.Meal.objects.order_by('order')
+        daily_nutrition = []
         for days in range(days_ahead):
+            days_recipes = []
             for meal in meals:
                 try:
                     meal_choice = models.MealChoice.objects.get(
@@ -65,8 +69,10 @@ def planner(request, year, month, day, scope):
                     initial.append({'meal': meal.pk,
                                     'recipe': meal.default and meal.default.pk})
                 else:
+                    days_recipes.append(meal_choice.recipe)
                     initial.append({'meal': meal.pk,
                                     'recipe': meal_choice.recipe.pk})
+            daily_nutrition.append(_get_total_nutrition(days_recipes))
         formset = forms.MealChoiceFormSet(initial=initial)
         grouped_forms = utils.itergroup(formset.forms, meals.count())
     if request.is_ajax():
@@ -77,6 +83,7 @@ def planner(request, year, month, day, scope):
         'meals/%s.html' % template,
         {'formset': formset,
          'meals': meals,
+         'daily_nutrition': iter(daily_nutrition),
          'weekdays': iter(weekdays),
          'grouped_forms': grouped_forms,
          'shopping_list': _get_shopping_list(
@@ -85,6 +92,9 @@ def planner(request, year, month, day, scope):
 
 
 class Amount(object):
+    # TODO: must be easier to store all amounts in the database in the same
+    # unit, and just convert for presentation -- then no need for conversions
+    # between units when doing calculations
     def __init__(self, ingredient, amount, unit):
         self.ingredient = ingredient
         #TODO: use decimals for amounts
@@ -112,6 +122,13 @@ class Amount(object):
                     conversion.to_unit)
         return new_amount
 
+    def __div__(self, other_amount):
+        # TODO: not sure I want to use __div__ as this function doesn't return
+        # an Amount but a ratio of amounts ...
+        other_amount = self._convert_amount(other_amount)
+        # TODO: use decimals
+        return self.amount / float(other_amount.amount)
+
     def divide(self, parts):
         return self.__class__(self.ingredient, 
                               self.amount / float(parts),
@@ -128,6 +145,37 @@ class Amount(object):
         if self.amount > 1:
             return self.unit.pluralize()
         return self.unit.name
+    
+    def _convert_amount(self, other_amount):
+        """Converts other amount to the same units as self if possible"""
+        # TODO: check the substances are the same!
+        if self.unit == other_amount.unit:
+            return other_amount
+        else:
+            conversion = None
+            try:
+                conversion = models.Conversion.objects.get(
+                    from_unit=other_amount.unit,
+                    to_unit=self.unit)
+            except models.Conversion.DoesNotExist:
+                try:
+                    conversion = models.Conversion.objects.get(
+                        to_unit=other_amount.unit,
+                        from_unit=self.unit)
+                except:
+                    raise TypeError("Can't convert %s to %s" % 
+                                    (self.unit,
+                                     other_amount.unit))
+                else:
+                    factor = 1 / conversion.factor
+            else:
+                factor = conversion.factor
+            if conversion:
+                new_amount = self.__class__(
+                    self.ingredient,
+                    other_amount.amount * factor,
+                    self.unit)
+        return new_amount
 
 
 def _get_shopping_list(start_date, end_date):
@@ -144,3 +192,33 @@ def _get_shopping_list(start_date, end_date):
             measure.amount, 
             measure.unit).divide(measure.recipe.serves)
     return shopping_list
+
+
+def _get_total_nutrition(recipe_list):
+    nutrition_totals = {}
+    for recipe in recipe_list:
+        for ingredient in recipe.ingredients.all():
+            for nutrient in models.Nutrient.objects.all():
+                try:
+                    nutrition = ingredient.ingredient.nutrition_set.get(
+                        nutrient=nutrient)
+                except models.Nutrition.DoesNotExist:
+                    pass
+                else:
+                    ratio = (Amount(ingredient.ingredient,
+                                    ingredient.amount,
+                                    ingredient.unit) / 
+                             Amount(nutrition.ingredient,
+                                    nutrition.ingredient_amount,
+                                    nutrition.ingredient_unit))
+                    nutrient_amount = Amount(
+                        nutrition.nutrient,
+                        nutrition.nutrient_amount * Decimal(str(ratio)),
+                        nutrition.nutrient_unit)
+                    if not nutrition_totals.has_key(nutrition.nutrient):
+                        nutrition_totals[nutrition.nutrient] = Amount(
+                            nutrition.nutrient,
+                            0,
+                            nutrition.nutrient_unit)
+                    nutrition_totals[nutrition.nutrient] += nutrient_amount
+    return nutrition_totals

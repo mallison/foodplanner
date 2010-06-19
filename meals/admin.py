@@ -13,6 +13,10 @@ class ConversionInline(admin.TabularInline):
     fk_name = 'from_unit'
 
 
+class NutritonInline(admin.TabularInline):
+    model = models.Nutrition
+
+
 admin.site.register(models.Meal,
                     list_display=('name', 'order', 'default'),
                     list_editable=('order',))
@@ -22,8 +26,11 @@ admin.site.register(models.Recipe,
                     inlines=(IngredientMeasureInline,),
                     list_display=('name', 'serves'),
                     list_editable=('serves',))
-admin.site.register(models.Ingredient)
+admin.site.register(models.Ingredient,
+                    inlines=(NutritonInline,))
 admin.site.register(models.Conversion,
                     list_display=('from_unit', 'factor', 'to_unit', 'is_exact'))
 admin.site.register(models.Unit,
                     inlines=(ConversionInline,))
+admin.site.register(models.Nutrient)
+admin.site.register(models.Nutrition)
