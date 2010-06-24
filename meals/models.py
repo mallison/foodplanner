@@ -32,6 +32,11 @@ class Recipe(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_nutrition(self):
+        #FIXME
+        import views
+        return views._get_total_nutrition([self])
+
 
 class BasePluralizableModel(models.Model):
     plural_name = models.CharField(max_length=100, blank=True)

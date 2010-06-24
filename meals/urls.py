@@ -3,9 +3,18 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+import models
 
-    url(r'^(\d{4})/(\d{2})/(\d{2})/(\w+)/$', 
+urlpatterns = patterns('',
+                       
+   url(r'^$', 'meals.views.home'),
+
+   url(r'^recipes/$',
+       'django.views.generic.list_detail.object_list',
+       {'queryset': models.Recipe.objects.all(),
+        'template_object_name': 'recipe'}),
+
+   url(r'^(\d{4})/(\d{2})/(\d{2})/(\w+)/$', 
         'meals.views.planner',
         name="meals-planner"),
 

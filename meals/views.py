@@ -14,6 +14,17 @@ import models
 import utils
 
 
+def home(request):
+    today = datetime.date.today()
+    todays_page = reverse('meals-planner',
+                          args=(today.year, 
+                                '%02d' % today.month, 
+                                '%02d' % today.day, 
+                                'week'))
+    return render_to_response('meals/home.html',
+                              {'today': todays_page})
+
+
 def planner(request, year, month, day, scope):
     date = datetime.date(*map(int, (year, month, day)))
     if scope == 'week': 
@@ -128,6 +139,9 @@ class Amount(object):
         other_amount = self._convert_amount(other_amount)
         # TODO: use decimals
         return self.amount / float(other_amount.amount)
+    
+    def __unicode__(self):
+        return '%s %s' % (self.amount, self.unit.name)
 
     def divide(self, parts):
         return self.__class__(self.ingredient, 
