@@ -7,12 +7,13 @@ import models
 
 urlpatterns = patterns('',
                        
-   url(r'^$', 'meals.views.home'),
+   url(r'^$', 'meals.views.home', name="xxx-home"),
 
    url(r'^recipes/$',
        'django.views.generic.list_detail.object_list',
        {'queryset': models.Recipe.objects.all(),
-        'template_object_name': 'recipe'}),
+        'template_object_name': 'recipe'},
+       name="xxx-recipes"),
 
    url(r'^(\d{4})/(\d{2})/(\d{2})/(\w+)/$', 
         'meals.views.planner',
