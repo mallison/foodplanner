@@ -145,7 +145,7 @@ class Amount(object):
 
     def divide(self, parts):
         return self.__class__(self.ingredient, 
-                              self.amount / float(parts),
+                              self.amount / parts,
                               self.unit)
 
     def pluralize_ingredient(self):

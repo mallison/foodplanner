@@ -41,3 +41,42 @@
 {% endfor %}
 </table>
 </div>
+<script>
+$(function () {
+
+    var active_select;
+
+    $('body').click(function (e) {
+        if (active_select && e.target !== active_select.get(0) && e.target !== active_select.next().get(0)) {
+            deactivate_select();
+        }
+    });
+
+    var deactivate_select = function () {
+            active_select.hide();
+            active_select.next().show();
+            active_select = null;
+    };
+
+    var select_widget = function (select) {
+        var display = $('<span>------</span>');
+        select.after(display);
+        select.hide();
+        display.text(select.find('option:selected').text());
+        display.click(function (e) {
+            if (active_select) {
+                deactivate_select();
+            }
+            display.hide();
+            select.show();
+            select.click();
+            active_select = select;
+        });
+    }
+
+    $('select').each(function () {
+        select_widget($(this));
+    });
+
+});
+</script>
