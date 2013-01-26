@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 
 
 # local app imports
@@ -90,7 +90,8 @@ def planner(request, year, month, day, scope):
         template = 'planner_inner'
     else:
         template = 'planner'
-    return render_to_response(
+    return render(
+        request,
         'meals/%s.html' % template,
         {'formset': formset,
          'meals': meals,
